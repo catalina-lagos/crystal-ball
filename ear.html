@@ -16,39 +16,53 @@
       font-size: 1.4em;
       margin-top: 2em;
     }
+    #speakBtn {
+      margin-top: 1.5em;
+      font-size: 1em;
+      background: #6b46c1;
+      color: white;
+      border: none;
+      padding: 0.8em 1.4em;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
   </style>
 </head>
 <body>
   <h1>👂 The Oracle Speaks</h1>
   <p id="message">Listening to the whispers...</p>
+  <button onclick="speakMessage()" id="speakBtn">🔊 Tap to hear the whisper</button>
 
   <script>
+    let chosen = "";
+
     const sheetURL = 'https://docs.google.com/spreadsheets/d/1OGSmc3Y7q_5z0CBDoyycPNs6Pt8Ldy27QEak6FaBMKM/gviz/tq?tqx=out:json';
 
     fetch(sheetURL)
-  .then(res => res.text())
-  .then(text => {
-    const json = JSON.parse(text.substring(47).slice(0, -2)); // Strip Google JSONP wrapper
-    const rows = json.table.rows;
+      .then(res => res.text())
+      .then(text => {
+        const json = JSON.parse(text.substring(47).slice(0, -2)); // Strip Google JSONP wrapper
+        const rows = json.table.rows;
+        const messages = rows.map(r => r.c[1]?.v).filter(Boolean);
+        chosen = messages[Math.floor(Math.random() * messages.length)];
 
-    // ✅ FIX: select the second column (message), not the first (timestamp)
-    const messages = rows.map(r => r.c[1]?.v).filter(Boolean);
-
-    const chosen = messages[Math.floor(Math.random() * messages.length)];
-
-    document.getElementById("message").textContent = chosen;
-
-    const voice = new SpeechSynthesisUtterance(chosen);
-    voice.rate = 0.95;
-    voice.pitch = 1.1;
-    voice.lang = 'en-US';
-    speechSynthesis.speak(voice);
-  })
-
+        document.getElementById("message").textContent = chosen;
+        document.getElementById("speakBtn").style.display = "inline-block";
+      })
       .catch(err => {
         document.getElementById("message").textContent = "The Oracle is silent... (Error loading messages)";
         console.error("Fetch error:", err);
       });
+
+    function speakMessage() {
+      if (!chosen) return;
+      const voice = new SpeechSynthesisUtterance(chosen);
+      voice.pitch = 1.1;
+      voice.rate = 0.95;
+      voice.lang = 'en-US';
+      speechSynthesis.speak(voice);
+    }
   </script>
 </body>
 </html>
