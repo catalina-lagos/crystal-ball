@@ -113,40 +113,45 @@
       });
 
     function revealMessage() {
-      const messageEl = document.getElementById("message");
-      const btn = document.getElementById("revealBtn");
-      messageEl.textContent = "";
-      messageEl.style.opacity = 1;
+  const messageEl = document.getElementById("message");
+  const btn = document.getElementById("revealBtn");
 
-      let i = 0;
-      const glitch = setInterval(() => {
-        messageEl.classList.add("glitch-reveal");
-        messageEl.textContent = chosen.slice(0, i + 1);
-        i++;
-        if (i >= chosen.length) {
-          clearInterval(glitch);
-          messageEl.classList.remove("glitch-reveal");
-        }
-      }, 40);
+  // Hide the status text
+  document.getElementById("status").style.display = "none";
 
-      // Optional: play a chime sound first (can add audio file later)
-      const voices = speechSynthesis.getVoices();
-      const options = voices.filter(v =>
-        v.lang.startsWith("en") || v.lang.startsWith("en-GB") || v.lang.startsWith("en-US")
-      );
+  // Reveal message with typing + glitch
+  messageEl.textContent = "";
+  messageEl.style.opacity = 1;
 
-      const utterance = new SpeechSynthesisUtterance(chosen);
-      utterance.pitch = 0.9 + Math.random() * 0.4;
-      utterance.rate = 0.9 + Math.random() * 0.2;
-      if (options.length > 0) {
-        utterance.voice = options[Math.floor(Math.random() * options.length)];
-      }
-
-      speechSynthesis.speak(utterance);
-
-      btn.textContent = "🔊 Hear it again";
-      btn.onclick = () => speechSynthesis.speak(utterance);
+  let i = 0;
+  const glitch = setInterval(() => {
+    messageEl.classList.add("glitch-reveal");
+    messageEl.textContent = chosen.slice(0, i + 1);
+    i++;
+    if (i >= chosen.length) {
+      clearInterval(glitch);
+      messageEl.classList.remove("glitch-reveal");
     }
+  }, 40);
+
+  const voices = speechSynthesis.getVoices();
+  const options = voices.filter(v =>
+    v.lang.startsWith("en") || v.lang.startsWith("en-GB") || v.lang.startsWith("en-US")
+  );
+
+  const utterance = new SpeechSynthesisUtterance(chosen);
+  utterance.pitch = 0.9 + Math.random() * 0.4;
+  utterance.rate = 0.9 + Math.random() * 0.2;
+  if (options.length > 0) {
+    utterance.voice = options[Math.floor(Math.random() * options.length)];
+  }
+
+  speechSynthesis.speak(utterance);
+
+  btn.textContent = "🔊 Hear it again";
+  btn.onclick = () => speechSynthesis.speak(utterance);
+}
+
   </script>
 </body>
 </html>
