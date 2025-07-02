@@ -11,57 +11,96 @@
       font-family: 'Georgia', serif;
       text-align: center;
       padding: 2em;
+      overflow: hidden;
     }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 1em;
+    }
+
     #message {
       font-size: 1.4em;
       margin-top: 2em;
+      opacity: 0;
+      transition: opacity 1s ease-in;
     }
-    #speakBtn {
-      margin-top: 1.5em;
-      font-size: 1em;
-      background: #6b46c1;
+
+    #revealBtn {
+      margin-top: 2em;
+      font-size: 1.2em;
+      background: linear-gradient(135deg, #8a5cff, #db7cff);
       color: white;
       border: none;
-      padding: 0.8em 1.4em;
-      border-radius: 8px;
+      padding: 0.8em 1.6em;
+      border-radius: 12px;
       cursor: pointer;
+      box-shadow: 0 0 12px #a678ff;
+      animation: shimmer 2s infinite alternate;
       display: none;
+    }
+
+    @keyframes shimmer {
+      from { box-shadow: 0 0 8px #8a5cff; }
+      to   { box-shadow: 0 0 20px #db7cff; }
+    }
+
+    .revealed {
+      opacity: 1;
     }
   </style>
 </head>
 <body>
-  <h1>The Oracle Speaks</h1>
-  <p id="message">Listening to the whispers...</p>
-  <button onclick="speakMessage()" id="speakBtn">🔊 Tap to hear the whisper</button>
+  <h1>👁️ The Oracle Speaks</h1>
+  <p id="status">Listening to the whispers...</p>
+  <button id="revealBtn" onclick="revealMessage()">🔮 Reveal the Oracle’s message</button>
+  <p id="message"></p>
 
   <script>
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/1OGSmc3Y7q_5z0CBDoyycPNs6Pt8Ldy27QEak6FaBMKM/gviz/tq?tqx=out:json';
     let chosen = "";
 
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/1OGSmc3Y7q_5z0CBDoyycPNs6Pt8Ldy27QEak6FaBMKM/gviz/tq?tqx=out:json';
-
+    // Fetch message
     fetch(sheetURL)
       .then(res => res.text())
       .then(text => {
         const json = JSON.parse(text.substring(47).slice(0, -2)); // Strip Google JSONP wrapper
         const rows = json.table.rows;
         const messages = rows.map(r => r.c[1]?.v).filter(Boolean);
+
+        if (messages.length === 0) {
+          document.getElementById("status").textContent = "The Oracle is... silent.";
+          return;
+        }
+
         chosen = messages[Math.floor(Math.random() * messages.length)];
 
-        document.getElementById("message").textContent = chosen;
-        document.getElementById("speakBtn").style.display = "inline-block";
+        document.getElementById("status").textContent = "A message has been received.";
+        document.getElementById("revealBtn").style.display = "inline-block";
       })
       .catch(err => {
-        document.getElementById("message").textContent = "The Oracle is silent... (Error loading messages)";
+        document.getElementById("status").textContent = "The Oracle is silent... (Error loading)";
         console.error("Fetch error:", err);
       });
 
-    function speakMessage() {
-      if (!chosen) return;
-      const voice = new SpeechSynthesisUtterance(chosen);
-      voice.pitch = 1.1;
-      voice.rate = 0.95;
-      voice.lang = 'en-US';
-      speechSynthesis.speak(voice);
+    function revealMessage() {
+      const messageEl = document.getElementById("message");
+      messageEl.textContent = chosen;
+      messageEl.classList.add("revealed");
+
+      const voices = speechSynthesis.getVoices();
+      const options = voices.filter(v =>
+        v.lang.startsWith("en") || v.lang.startsWith("en-GB") || v.lang.startsWith("en-US")
+      );
+
+      const utterance = new SpeechSynthesisUtterance(chosen);
+      utterance.pitch = 0.9 + Math.random() * 0.4;
+      utterance.rate = 0.9 + Math.random() * 0.2;
+      if (options.length > 0) {
+        utterance.voice = options[Math.floor(Math.random() * options.length)];
+      }
+
+      speechSynthesis.speak(utterance);
     }
   </script>
 </body>
