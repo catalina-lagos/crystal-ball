@@ -38,4 +38,21 @@ body {
     font-size: 1.1em;
     color: #e0e0ff;
   }
+#revealArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#message {
+  font-size: 1.6em;
+  margin-top: 1em;
+  opacity: 0;
+  white-space: pre-wrap;
+  min-height: 3em;
+  max-width: 80%;
+  text-align: center;
+}
+
   
