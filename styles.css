@@ -1,0 +1,41 @@
+body {
+    background: radial-gradient(ellipse at center, #1b0033, #000);
+    font-family: 'Noto Serif', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+  
+  .ball {
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    background: radial-gradient(circle, #8e44ad, #2c3e50);
+    border-radius: 50%;
+    box-shadow: 0 0 40px #8e44ad;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .ball:hover {
+    box-shadow: 0 0 60px #dcd0ff;
+  }
+  
+  #message {
+    padding: 10px;
+    font-size: 1.1em;
+    color: #e0e0ff;
+  }
+  
